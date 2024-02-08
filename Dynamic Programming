@@ -1,0 +1,79 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+void printLCSAndTable(const string& X, const string& Y, const vector<vector<int>>& dp) {
+
+    cout << "LCS Table:\n";
+    cout << "   ";
+    for (char c : Y)
+        cout << c << " ";
+    cout << endl;
+    
+    for (int i = 0; i <= X.size(); ++i) {
+        if (i == 0)
+            cout << " ";
+        else
+            cout << X[i-1] << " ";
+        
+        for (int j = 0; j <= Y.size(); ++j) {
+            cout << dp[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+    
+    cout << "Longest Common Subsequence: ";
+    int i = X.size(), j = Y.size();
+    string lcs = "";
+    while (i > 0 && j > 0) {
+        if (X[i-1] == Y[j-1]) {
+            lcs = X[i-1] + lcs;
+            i--;
+            j--;
+        }
+        else if (dp[i-1][j] > dp[i][j-1])
+            i--;
+        else
+            j--;
+    }
+    cout << lcs << endl;
+}
+
+int longestCommonSubsequence(const string& X, const string& Y) {
+    int m = X.size();
+    int n = Y.size();
+    
+    vector<vector<int>> dp(m + 1, vector<int>(n + 1, 0));
+    
+    for (int i = 1; i <= m; ++i) {
+        for (int j = 1; j <= n; ++j) {
+            if (X[i-1] == Y[j-1])
+                dp[i][j] = dp[i-1][j-1] + 1;
+            else
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    }
+    
+    printLCSAndTable(X, Y, dp);
+    
+    return dp[m][n];
+}
+
+int main() {
+    string sequence1, sequence2;
+    cin >> sequence1 >> sequence2;
+    
+    if (sequence1.find_first_of(sequence2) == string::npos) {
+        cerr << "Error: Matching Sequence Not Found." << endl;
+        return 1;
+    }
+    
+    int seqLen = longestCommonSubsequence(sequence1, sequence2);
+    cout << "Length of the LCS: " << seqLen << endl;
+
+    return 0;
+}
